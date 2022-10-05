@@ -110,3 +110,8 @@ func (u UUIDType) ValueFromTerraform(_ context.Context, value tftypes.Value) (at
 
 	return UUIDFromGoogleUUID(parsedUUID), nil
 }
+
+// ValueType returns attr.Value type returned by ValueFromTerraform.
+func (u UUIDType) ValueType(context.Context) attr.Value {
+	return UUID{}
+}
