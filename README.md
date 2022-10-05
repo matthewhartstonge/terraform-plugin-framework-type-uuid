@@ -10,7 +10,7 @@ and DCE 1.1: Authentication and Security Services.
 
 ### Schema
 
-Replace usages of `types.StringType` with `uuidtype.Type{}`.
+Replace usages of `types.StringType` with `uuidtype.UUIDType{}`.
 
 Given the previous schema attribute:
 
@@ -27,14 +27,14 @@ The updated schema will look like:
 ```go
 tfsdk.Attribute{
 	Required: true
-	Type:     uuidtype.Type{}
+	Type:     uuidtype.UUIDType{}
 }
 ```
 
 ### Schema Data Model
 
 Replace usage of `string`, `*string`, or `types.String` in schema data models 
-with `uuidtype.Value`.
+with `uuidtype.UUID`.
 
 Given the previous schema data model:
 
@@ -50,7 +50,7 @@ The updated schema data model will look like:
 ```go
 type ThingResourceModel struct {
     // ...
-    Example uuidtype.Value `tfsdk:"example"`
+    Example uuidtype.UUID `tfsdk:"example"`
 }
 ```
 
@@ -62,24 +62,24 @@ a known `uuid` value.
 
 ### Writing Values
 
-Create a `uuidtype.Value` by calling one of these functions:
+Create a `uuidtype.UUID` by calling one of these functions:
 
-- `NullValue() Value`: creates a `null` value.
-- `UnknownValue() Value`: creates an unknown value.
-- `StringValue(string, path.Path) (Value, diag.Diagnostics)`: creates a known 
+- `NullUUID() UUID`: creates a `null` value.
+- `UnknownUUID() UUID`: creates an unknown value.
+- `UUIDFromString(string, path.Path) (UUID, diag.Diagnostics)`: creates a known 
    value using the given `string` or returns validation errors if `string` is 
    not in the expected UUID format.
-- `MustValue(string) Value` creates a known value using the given string, but 
-   will panic if it's unparseable as a UUID.
+- `UUIDFromGoogleUUID(uuid.UUID) UUID` creates a known value given a
+  Google [uuid.UUID](https://pkg.go.dev/github.com/google/uuid#UUID) struct.
 
 ### Adding the Dependency
 
-All functionality is located in the `github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtype` 
+All functionality is located in the `github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtypes` 
 package. Add this as an `import` as required to your relevant Go files.
 
 Run the following Go commands to fetch the latest version and ensure all module files are up-to-date.
 
 ```shell
-go get github.com/matthewhartstonge/terraform-plugin-framework-type-uuidtype@latest
+go get github.com/matthewhartstonge/terraform-plugin-framework-type-uuid@latest
 go mod tidy
 ```

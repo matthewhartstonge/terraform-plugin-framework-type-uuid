@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uuidtype_test
+package uuidtypes_test
 
 import (
 	// Standard Library Imports
@@ -24,6 +24,7 @@ import (
 
 	// External Imports
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -31,7 +32,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 
 	// Internal Imports
-	"github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtype"
+	"github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtypes"
 )
 
 func TestType_ApplyTerraform5AttributePathStep(t *testing.T) {
@@ -46,22 +47,22 @@ func TestType_ApplyTerraform5AttributePathStep(t *testing.T) {
 		{
 			name:        "tftypes.AttributeName",
 			step:        tftypes.AttributeName("test"),
-			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.AttributeName to uuidtype.Type"),
+			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.AttributeName to uuidtypes.UUIDType"),
 		},
 		{
 			name:        "tftypes.ElementKeyInt",
 			step:        tftypes.ElementKeyInt(0),
-			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyInt to uuidtype.Type"),
+			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyInt to uuidtypes.UUIDType"),
 		},
 		{
 			name:        "tftypes.ElementKeyString",
 			step:        tftypes.ElementKeyString("test"),
-			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyString to uuidtype.Type"),
+			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyString to uuidtypes.UUIDType"),
 		},
 		{
 			name:        "tftypes.ElementKeyValue",
 			step:        tftypes.ElementKeyValue{},
-			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyValue to uuidtype.Type"),
+			expectedErr: fmt.Errorf("cannot apply AttributePathStep to tftypes.ElementKeyValue to uuidtypes.UUIDType"),
 		},
 	}
 	for _, testcase := range tests {
@@ -70,7 +71,7 @@ func TestType_ApplyTerraform5AttributePathStep(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			got, err := uuidType.ApplyTerraform5AttributePathStep(testcase.step)
 			if err != nil {
 				if testcase.expectedErr == nil || err.Error() != testcase.expectedErr.Error() {
@@ -109,8 +110,8 @@ func TestType_Equal(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:     "uuidtype.Type",
-			other:    uuidtype.Type{},
+			name:     "uuidtypes.UUIDType",
+			other:    uuidtypes.UUIDType{},
 			expected: true,
 		},
 		{
@@ -140,7 +141,7 @@ func TestType_Equal(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			if got := uuidType.Equal(testcase.other); got != testcase.expected {
 				t.Errorf("Equal()\ngot     : %v\nexpected: %v", got, testcase.expected)
 			}
@@ -153,12 +154,11 @@ func TestType_String(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		typ      uuidtype.Type
 		expected string
 	}{
 		{
 			name:     "always",
-			expected: "uuidtype.Type",
+			expected: "uuidtypes.UUIDType",
 		},
 	}
 
@@ -168,7 +168,7 @@ func TestType_String(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			got := uuidType.String()
 
 			if diff := cmp.Diff(got, testcase.expected); diff != "" {
@@ -197,7 +197,7 @@ func TestType_TerraformType(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			got := uuidType.TerraformType(context.Background())
 
 			if diff := cmp.Diff(got, testcase.expected); diff != "" {
@@ -277,25 +277,25 @@ func TestType_Validate(t *testing.T) {
 		},
 		{
 			name:  "string-value-valid-uuidv1",
-			value: tftypes.NewValue(tftypes.String, "4ea3c666-4309-11ed-b878-0242ac120002"),
+			value: tftypes.NewValue(tftypes.String, valueUUIDv1),
 			path:  path.Root("test"),
 		},
 		// can't find a reference UUIDv2...
 		{
 			name:     "string-value-valid-uuidv3",
-			value:    tftypes.NewValue(tftypes.String, "a825d19e-3885-3df7-920a-a3678f53b2ee"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv3),
 			path:     path.Root("test"),
 			expected: nil,
 		},
 		{
 			name:     "string-value-valid-uuidv4",
-			value:    tftypes.NewValue(tftypes.String, "eb6f148a-6637-4c6b-a4bb-b75b2a1b5a3c"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv4),
 			path:     path.Root("test"),
 			expected: nil,
 		},
 		{
 			name:     "string-value-valid-uuidv5",
-			value:    tftypes.NewValue(tftypes.String, "f989a266-a679-5f41-92f7-22004c4da817"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv5),
 			path:     path.Root("test"),
 			expected: nil,
 		},
@@ -307,7 +307,7 @@ func TestType_Validate(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			got := uuidType.Validate(context.Background(), testcase.value, testcase.path)
 
 			if diff := cmp.Diff(got, testcase.expected); diff != "" {
@@ -334,51 +334,51 @@ func TestType_ValueFromTerraform(t *testing.T) {
 		{
 			name:        "not-string",
 			value:       tftypes.NewValue(tftypes.Number, 1),
-			expected:    uuidtype.UnknownValue(),
+			expected:    uuidtypes.UUIDUnknown(),
 			expectedErr: fmt.Errorf("can't unmarshal tftypes.Number into *string, expected string"),
 		},
 		{
 			name:     "string-null",
 			value:    tftypes.NewValue(tftypes.String, nil),
-			expected: uuidtype.NullValue(),
+			expected: uuidtypes.UUIDNull(),
 		},
 		{
 			name:     "string-unknown",
 			value:    tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
-			expected: uuidtype.UnknownValue(),
+			expected: uuidtypes.UUIDUnknown(),
 		},
 		{
 			name:        "string-value-invalid-length",
-			value:       tftypes.NewValue(tftypes.String, "not-a-uuid-at-all"),
-			expected:    uuidtype.UnknownValue(),
+			value:       tftypes.NewValue(tftypes.String, valueInvalidLength),
+			expected:    uuidtypes.UUIDUnknown(),
 			expectedErr: fmt.Errorf("invalid UUID length: 17"),
 		},
 		{
 			name:        "string-value-invalid-value",
-			value:       tftypes.NewValue(tftypes.String, "actually-not0-4a00-UUID-at0all00"),
-			expected:    uuidtype.UnknownValue(),
+			value:       tftypes.NewValue(tftypes.String, valueInvalid),
+			expected:    uuidtypes.UUIDUnknown(),
 			expectedErr: fmt.Errorf("invalid UUID format"),
 		},
 		{
 			name:     "string-value-valid-uuidv1",
-			value:    tftypes.NewValue(tftypes.String, "4ea3c666-4309-11ed-b878-0242ac120002"),
-			expected: uuidtype.MustValue("4ea3c666-4309-11ed-b878-0242ac120002"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv1),
+			expected: uuidtypes.UUIDFromGoogleUUID(uuid.MustParse(valueUUIDv1)),
 		},
 		// can't find a reference UUIDv2...
 		{
 			name:     "string-value-valid-uuidv3",
-			value:    tftypes.NewValue(tftypes.String, "a825d19e-3885-3df7-920a-a3678f53b2ee"),
-			expected: uuidtype.MustValue("a825d19e-3885-3df7-920a-a3678f53b2ee"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv3),
+			expected: uuidtypes.UUIDFromGoogleUUID(uuid.MustParse(valueUUIDv3)),
 		},
 		{
 			name:     "string-value-valid-uuidv4",
-			value:    tftypes.NewValue(tftypes.String, "eb6f148a-6637-4c6b-a4bb-b75b2a1b5a3c"),
-			expected: uuidtype.MustValue("eb6f148a-6637-4c6b-a4bb-b75b2a1b5a3c"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv4),
+			expected: uuidtypes.UUIDFromGoogleUUID(uuid.MustParse(valueUUIDv4)),
 		},
 		{
 			name:     "string-value-valid-uuidv5",
-			value:    tftypes.NewValue(tftypes.String, "f989a266-a679-5f41-92f7-22004c4da817"),
-			expected: uuidtype.MustValue("f989a266-a679-5f41-92f7-22004c4da817"),
+			value:    tftypes.NewValue(tftypes.String, valueUUIDv5),
+			expected: uuidtypes.UUIDFromGoogleUUID(uuid.MustParse(valueUUIDv5)),
 		},
 	}
 
@@ -388,7 +388,7 @@ func TestType_ValueFromTerraform(t *testing.T) {
 		t.Run(testcase.name, func(t *testing.T) {
 			t.Parallel()
 
-			uuidType := uuidtype.Type{}
+			uuidType := uuidtypes.UUIDType{}
 			got, err := uuidType.ValueFromTerraform(context.Background(), testcase.value)
 			if err != nil {
 				if testcase.expectedErr == nil || err.Error() != testcase.expectedErr.Error() {
@@ -403,7 +403,7 @@ func TestType_ValueFromTerraform(t *testing.T) {
 
 			if diff := cmp.Diff(got, testcase.expected); diff != "" {
 				t.Errorf(
-					"ValueFromTerraform()\nvalue   : %v\nexpected: %v\ndiff    : %s\n",
+					"ValueFromTerraform()\ngot     : %v\nexpected: %v\ndiff    : %s\n",
 					got,
 					testcase.expected,
 					diff,
