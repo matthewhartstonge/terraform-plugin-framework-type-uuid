@@ -74,12 +74,12 @@ Create a `uuidtype.UUID` by calling one of these functions:
 
 ### Adding the Dependency
 
-All functionality is located in the `github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtype` 
+All functionality is located in the `github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtypes` 
 package. Add this as an `import` as required to your relevant Go files.
 
 Run the following Go commands to fetch the latest version and ensure all module files are up-to-date.
 
 ```shell
-go get github.com/matthewhartstonge/terraform-plugin-framework-type-uuidtypes@latest
+go get github.com/matthewhartstonge/terraform-plugin-framework-type-uuid@latest
 go mod tidy
 ```
