@@ -412,3 +412,37 @@ func TestType_ValueFromTerraform(t *testing.T) {
 		})
 	}
 }
+
+func TestUUIDType_ValueType(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		value    uuidtypes.UUIDType
+		expected attr.Value
+	}{
+		{
+			name:     "always",
+			value:    uuidtypes.UUIDType{},
+			expected: uuidtypes.UUID{},
+		},
+	}
+	for _, testcase := range tests {
+		testcase := testcase
+
+		t.Run(testcase.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := testcase.value.ValueType(context.Background())
+
+			if diff := cmp.Diff(got, testcase.expected); diff != "" {
+				t.Errorf(
+					"Type()\ngot     : %v\nexpected: %v\ndiff: %v\n",
+					got,
+					testcase.expected,
+					diff,
+				)
+			}
+		})
+	}
+}
