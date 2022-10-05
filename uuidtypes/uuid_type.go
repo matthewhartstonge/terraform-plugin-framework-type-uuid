@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uuidtype
+package uuidtypes
 
 import (
 	// Standard Library Imports
@@ -32,39 +32,39 @@ import (
 
 // Ensure Implementation matches the expected interfaces.
 var (
-	_ attr.Type                    = Type{}
-	_ tftypes.AttributePathStepper = Type{}
-	_ xattr.TypeWithValidate       = Type{}
+	_ attr.Type                    = UUIDType{}
+	_ tftypes.AttributePathStepper = UUIDType{}
+	_ xattr.TypeWithValidate       = UUIDType{}
 )
 
-type Type struct{}
+type UUIDType struct{}
 
 // ApplyTerraform5AttributePathStep always returns an error as this type cannot
 // be walked any further.
-func (t Type) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
-	return nil, fmt.Errorf("cannot apply AttributePathStep to %T to %s", step, t.String())
+func (u UUIDType) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
+	return nil, fmt.Errorf("cannot apply AttributePathStep to %T to %s", step, u.String())
 }
 
 // Equal returns true if the incoming Type is equal to the UUID type.
-func (t Type) Equal(other attr.Type) bool {
-	_, ok := other.(Type)
+func (u UUIDType) Equal(other attr.Type) bool {
+	_, ok := other.(UUIDType)
 
 	return ok
 }
 
 // String returns a human-friendly version of the UUID Type.
-func (t Type) String() string {
-	return "uuidtype.Type"
+func (u UUIDType) String() string {
+	return "uuidtypes.UUIDType"
 }
 
 // TerraformType returns tftypes.String.
-func (t Type) TerraformType(_ context.Context) tftypes.Type {
+func (u UUIDType) TerraformType(_ context.Context) tftypes.Type {
 	return tftypes.String
 }
 
 // Validate returns any warnings or errors that occur while attempting to parse
 // a UUID value.
-func (t Type) Validate(_ context.Context, value tftypes.Value, schemaPath path.Path) diag.Diagnostics {
+func (u UUIDType) Validate(_ context.Context, value tftypes.Value, schemaPath path.Path) diag.Diagnostics {
 	if value.IsNull() || !value.IsKnown() {
 		return nil
 	}
@@ -83,29 +83,30 @@ func (t Type) Validate(_ context.Context, value tftypes.Value, schemaPath path.P
 		}
 	}
 
-	_, diags := StringValue(str, schemaPath)
+	_, diags := UUIDFromString(str, schemaPath)
 
 	return diags
 }
 
 // ValueFromTerraform returns a UUID value given a tftypes.Value.
-func (t Type) ValueFromTerraform(_ context.Context, value tftypes.Value) (attr.Value, error) {
+func (u UUIDType) ValueFromTerraform(_ context.Context, value tftypes.Value) (attr.Value, error) {
 	if value.IsNull() {
-		return NullValue(), nil
+		return UUIDNull(), nil
 	}
 
 	if !value.IsKnown() {
-		return UnknownValue(), nil
+		return UUIDUnknown(), nil
 	}
 
 	var str string
 	if err := value.As(&str); err != nil {
-		return UnknownValue(), err
+		return UUIDUnknown(), err
 	}
 
-	if _, err := uuid.Parse(str); err != nil {
-		return UnknownValue(), err
+	parsedUUID, err := uuid.Parse(str)
+	if err != nil {
+		return UUIDUnknown(), err
 	}
 
-	return Value{value: str}, nil
+	return UUIDFromGoogleUUID(parsedUUID), nil
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uuidtype
+package uuidtypes
 
 import (
 	// Standard Library Imports
@@ -30,25 +30,25 @@ import (
 
 // Ensure Implementation matches the expected interfaces.
 var (
-	_ attr.Value = Value{}
+	_ attr.Value = UUID{}
 )
 
-// NullValue returns a null UUID value.
-func NullValue() Value {
-	return Value{null: true}
+// UUIDNull returns a null UUID value.
+func UUIDNull() UUID {
+	return UUID{null: true}
 }
 
-// UnknownValue returns an unknown UUID value.
-func UnknownValue() Value {
-	return Value{unknown: true}
+// UUIDUnknown returns an unknown UUID value.
+func UUIDUnknown() UUID {
+	return UUID{unknown: true}
 }
 
-// StringValue returns a value or any errors when attempting to parse the string
-// as a UUID.
-func StringValue(value string, schemaPath path.Path) (Value, diag.Diagnostics) {
+// UUIDFromString returns a value or any errors when attempting to parse the
+// string as a UUID.
+func UUIDFromString(value string, schemaPath path.Path) (UUID, diag.Diagnostics) {
 	validUUID, err := uuid.Parse(value)
 	if err != nil {
-		return UnknownValue(), diag.Diagnostics{
+		return UUIDUnknown(), diag.Diagnostics{
 			diag.NewAttributeErrorDiagnostic(
 				schemaPath,
 				"Invalid UUID String Value",
@@ -60,89 +60,86 @@ func StringValue(value string, schemaPath path.Path) (Value, diag.Diagnostics) {
 		}
 	}
 
-	return Value{
-		value: validUUID.String(),
+	return UUID{
+		value: validUUID,
 	}, nil
 }
 
-// MustValue expects a valid UUID, otherwise will panic on error.
-func MustValue(value string) Value {
-	validUUID, err := uuid.Parse(value)
-	if err != nil {
-		panic(err)
-	}
-
-	return Value{
-		value: validUUID.String(),
+// UUIDFromGoogleUUID expects a valid google/uuid.UUID and returns a Terraform
+// UUID Value.
+func UUIDFromGoogleUUID(value uuid.UUID) UUID {
+	return UUID{
+		value: value,
 	}
 }
 
-// Value provides a concrete implementation of a UUID tftypes.Value for the
+// UUID provides a concrete implementation of a UUID tftypes.Value for the
 // Terraform Plugin framework.
-type Value struct {
+type UUID struct {
 	null    bool
 	unknown bool
-	value   string
+	value   uuid.UUID
 }
 
-// Type returns the UUID type that created the Value.
-func (v Value) Type(_ context.Context) attr.Type {
-	return Type{}
+// Type returns the UUID type that created the UUID.
+func (u UUID) Type(_ context.Context) attr.Type {
+	return UUIDType{}
 }
 
 // ToTerraformValue returns the UUID as a tftypes.Value.
-func (v Value) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if v.IsNull() {
+func (u UUID) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
+	if u.IsNull() {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
 
-	if v.IsUnknown() {
+	if u.IsUnknown() {
 		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
 
-	return tftypes.NewValue(tftypes.String, v.value), nil
+	return tftypes.NewValue(tftypes.String, u.value.String()), nil
 }
 
 // IsNull returns true if the uuid represents a null value.
-func (v Value) IsNull() bool {
-	return v.null
+func (u UUID) IsNull() bool {
+	return u.null
 }
 
 // IsUnknown returns true if the uuid represents an unknown value.
-func (v Value) IsUnknown() bool {
-	return v.unknown
+func (u UUID) IsUnknown() bool {
+	return u.unknown
 }
 
 // Equal returns true if the uuid is semantically equal to the Value passed as
 // an argument.
-func (v Value) Equal(other attr.Value) bool {
-	otherValue, ok := other.(Value)
+func (u UUID) Equal(other attr.Value) bool {
+	otherValue, ok := other.(UUID)
 	if !ok {
 		return false
 	}
 
-	if otherValue.null != v.null {
+	if otherValue.null != u.null {
 		return false
 	}
 
-	if otherValue.unknown != v.unknown {
+	if otherValue.unknown != u.unknown {
 		return false
 	}
 
-	return otherValue.value == v.value
+	// perform a byte-for-byte comparison.
+	return otherValue.value == u.value
 }
 
 // String returns a summary representation of either the underlying Value,
 // or UnknownValueString (`<unknown>`) when IsUnknown() returns true,
 // or NullValueString (`<null>`) when IsNull() return true.
-func (v Value) String() string {
-	if v.null {
+func (u UUID) String() string {
+	if u.null {
 		return attr.NullValueString
 	}
 
-	if v.unknown {
+	if u.unknown {
 		return attr.UnknownValueString
 	}
 
-	return v.value
+	return u.value.String()
 }
