@@ -154,7 +154,6 @@ func TestType_String(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		typ      uuidtypes.UUIDType
 		expected string
 	}{
 		{

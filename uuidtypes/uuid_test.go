@@ -435,9 +435,6 @@ func TestUUID_Type(t *testing.T) {
 }
 
 func TestUUIDFromGoogleUUID(t *testing.T) {
-	type args struct {
-		value string
-	}
 	tests := []struct {
 		name     string
 		value    uuid.UUID
