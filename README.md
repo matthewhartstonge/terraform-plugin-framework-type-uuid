@@ -69,7 +69,7 @@ Create a `uuidtype.UUID` by calling one of these functions:
 - `UUIDFromString(string, path.Path) (UUID, diag.Diagnostics)`: creates a known 
    value using the given `string` or returns validation errors if `string` is 
    not in the expected UUID format.
-- `UUIDFromGoogleUUID(google/uuid.UUID) UUID` creates a known value given a
+- `UUIDFromGoogleUUID(uuid.UUID) UUID` creates a known value given a
   Google [uuid.UUID](https://pkg.go.dev/github.com/google/uuid#UUID) struct.
 
 ### Adding the Dependency
