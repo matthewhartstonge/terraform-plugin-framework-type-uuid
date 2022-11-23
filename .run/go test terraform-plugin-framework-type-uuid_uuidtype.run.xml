@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go test terraform-plugin-framework-type-uuid/uuidtype" type="GoTestRunConfiguration" factoryName="Go Test">
+    <module name="terraform-plugin-framework-type-uuid" />
+    <working_directory value="$PROJECT_DIR$/uuidtypes" />
+    <root_directory value="$PROJECT_DIR$" />
+    <kind value="PACKAGE" />
+    <package value="github.com/matthewhartstonge/terraform-plugin-framework-type-uuid/uuidtypes" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <method v="2" />
+  </configuration>
+</component>

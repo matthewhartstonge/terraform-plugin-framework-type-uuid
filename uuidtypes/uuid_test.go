@@ -150,7 +150,7 @@ func TestUUID_Equal(t *testing.T) {
 		{
 			name:     "not-uuidtypes.UUID",
 			value:    uuidtypes.UUIDFromGoogleUUID(uuid.MustParse(valueUUIDv4)),
-			other:    types.String{Value: valueUUIDv4},
+			other:    types.StringValue(valueUUIDv4),
 			expected: false,
 		},
 	}
