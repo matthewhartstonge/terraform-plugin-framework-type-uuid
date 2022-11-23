@@ -10,7 +10,7 @@ and DCE 1.1: Authentication and Security Services.
 
 ### Schema
 
-Replace usages of `types.StringType` with `uuidtype.UUIDType{}`.
+Replace usages of `types.StringType` with `uuidtypes.UUIDType{}`.
 
 Given the previous schema attribute:
 
@@ -27,7 +27,7 @@ The updated schema will look like:
 ```go
 tfsdk.Attribute{
 	Required: true
-	Type:     uuidtype.UUIDType{}
+	Type:     uuidtypes.UUIDType{}
 }
 ```
 
@@ -50,7 +50,7 @@ The updated schema data model will look like:
 ```go
 type ThingResourceModel struct {
     // ...
-    Example uuidtype.UUID `tfsdk:"example"`
+    Example uuidtypes.UUID `tfsdk:"example"`
 }
 ```
 
@@ -62,10 +62,10 @@ a known `uuid` value.
 
 ### Writing Values
 
-Create a `uuidtype.UUID` by calling one of these functions:
+Create a `uuidtypes.UUID` by calling one of these functions:
 
-- `NullUUID() UUID`: creates a `null` value.
-- `UnknownUUID() UUID`: creates an unknown value.
+- `UUIDNull() UUID`: creates a `null` value.
+- `UUIDUnknown() UUID`: creates an unknown value.
 - `UUIDFromString(string, path.Path) (UUID, diag.Diagnostics)`: creates a known 
    value using the given `string` or returns validation errors if `string` is 
    not in the expected UUID format.
