@@ -113,5 +113,5 @@ func (u UUIDType) ValueFromTerraform(_ context.Context, value tftypes.Value) (at
 
 // ValueType returns attr.Value type returned by ValueFromTerraform.
 func (u UUIDType) ValueType(context.Context) attr.Value {
-	return UUID{}
+	return UUIDNull()
 }

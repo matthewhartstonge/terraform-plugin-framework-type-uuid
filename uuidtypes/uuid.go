@@ -35,12 +35,12 @@ var (
 
 // UUIDNull returns a null UUID value.
 func UUIDNull() UUID {
-	return UUID{null: true}
+	return UUID{state: attr.ValueStateNull}
 }
 
 // UUIDUnknown returns an unknown UUID value.
 func UUIDUnknown() UUID {
-	return UUID{unknown: true}
+	return UUID{state: attr.ValueStateUnknown}
 }
 
 // UUIDFromString returns a value or any errors when attempting to parse the
@@ -61,6 +61,7 @@ func UUIDFromString(value string, schemaPath path.Path) (UUID, diag.Diagnostics)
 	}
 
 	return UUID{
+		state: attr.ValueStateKnown,
 		value: validUUID,
 	}, nil
 }
@@ -69,6 +70,7 @@ func UUIDFromString(value string, schemaPath path.Path) (UUID, diag.Diagnostics)
 // UUID Value.
 func UUIDFromGoogleUUID(value uuid.UUID) UUID {
 	return UUID{
+		state: attr.ValueStateKnown,
 		value: value,
 	}
 }
@@ -76,9 +78,8 @@ func UUIDFromGoogleUUID(value uuid.UUID) UUID {
 // UUID provides a concrete implementation of a UUID tftypes.Value for the
 // Terraform Plugin framework.
 type UUID struct {
-	null    bool
-	unknown bool
-	value   uuid.UUID
+	state attr.ValueState
+	value uuid.UUID
 }
 
 // Type returns the UUID type that created the UUID.
@@ -101,12 +102,12 @@ func (u UUID) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
 
 // IsNull returns true if the uuid represents a null value.
 func (u UUID) IsNull() bool {
-	return u.null
+	return u.state == attr.ValueStateNull
 }
 
 // IsUnknown returns true if the uuid represents an unknown value.
 func (u UUID) IsUnknown() bool {
-	return u.unknown
+	return u.state == attr.ValueStateUnknown
 }
 
 // Equal returns true if the uuid is semantically equal to the Value passed as
@@ -117,11 +118,7 @@ func (u UUID) Equal(other attr.Value) bool {
 		return false
 	}
 
-	if otherValue.null != u.null {
-		return false
-	}
-
-	if otherValue.unknown != u.unknown {
+	if otherValue.state != u.state {
 		return false
 	}
 
@@ -133,13 +130,14 @@ func (u UUID) Equal(other attr.Value) bool {
 // or UnknownValueString (`<unknown>`) when IsUnknown() returns true,
 // or NullValueString (`<null>`) when IsNull() return true.
 func (u UUID) String() string {
-	if u.null {
+	switch u.state {
+	case attr.ValueStateNull:
 		return attr.NullValueString
-	}
 
-	if u.unknown {
+	case attr.ValueStateUnknown:
 		return attr.UnknownValueString
-	}
 
-	return u.value.String()
+	default:
+		return u.value.String()
+	}
 }
