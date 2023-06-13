@@ -22,7 +22,7 @@ jobs:
       - name: Download Go Modules
         run: go mod download
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.5.0
+        uses: golangci/golangci-lint-action@v3.6.0
 
   test:
     name: Test Go@v${{ matrix.go-version }}
