@@ -11,6 +11,7 @@ package uuidtypes_test
 import (
 	// Standard Library Imports
 	"context"
+	"fmt"
 	"testing"
 
 	// External Imports
@@ -478,7 +479,9 @@ func TestUUIDFromString(t *testing.T) {
 	expectedDetail :=
 		"An unexpected error occurred attempting to parse a string value that was expected to be a valid UUID format. " +
 			"The expected UUID format is 00000000-0000-0000-0000-00000000. " +
-			"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"
+			"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n" +
+			"Provided Value: %s\n" +
+			"Parse Error: %s"
 
 	tests := []struct {
 		name          string
@@ -496,7 +499,7 @@ func TestUUIDFromString(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					expectedSummary,
-					expectedDetail+"Error: invalid UUID length: 0",
+					fmt.Sprintf(expectedDetail, "", "invalid UUID length: 0"),
 				),
 			},
 		},
@@ -509,7 +512,7 @@ func TestUUIDFromString(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					expectedSummary,
-					expectedDetail+"Error: invalid UUID length: 17",
+					fmt.Sprintf(expectedDetail, valueInvalidLength, "invalid UUID length: 17"),
 				),
 			},
 		},
@@ -522,7 +525,7 @@ func TestUUIDFromString(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					expectedSummary,
-					expectedDetail+"Error: invalid UUID format",
+					fmt.Sprintf(expectedDetail, valueInvalid, "invalid UUID format"),
 				),
 			},
 		},

@@ -11,6 +11,7 @@ package uuidtypes
 import (
 	// Standard Library Imports
 	"context"
+	"fmt"
 
 	// External Imports
 	"github.com/google/uuid"
@@ -47,7 +48,8 @@ func UUIDFromString(value string, schemaPath path.Path) (UUID, diag.Diagnostics)
 				"An unexpected error occurred attempting to parse a string value that was expected to be a valid UUID format. "+
 					"The expected UUID format is 00000000-0000-0000-0000-00000000. "+
 					"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"+
-					"Error: "+err.Error(),
+					fmt.Sprintf("Provided Value: %s\n", value)+
+					fmt.Sprintf("Parse Error: %s", err.Error()),
 			),
 		}
 	}

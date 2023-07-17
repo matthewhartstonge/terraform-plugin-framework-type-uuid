@@ -239,7 +239,7 @@ func TestType_Validate(t *testing.T) {
 		},
 		{
 			name:  "string-value-invalid-length",
-			value: tftypes.NewValue(tftypes.String, "not-a-uuid-at-all"),
+			value: tftypes.NewValue(tftypes.String, valueInvalidLength),
 			path:  path.Root("test"),
 			expected: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
@@ -254,7 +254,7 @@ func TestType_Validate(t *testing.T) {
 		},
 		{
 			name:  "string-value-invalid-format",
-			value: tftypes.NewValue(tftypes.String, "actually-not0-4a00-UUID-at0all00"),
+			value: tftypes.NewValue(tftypes.String, valueInvalid),
 			path:  path.Root("test"),
 			expected: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
@@ -263,7 +263,8 @@ func TestType_Validate(t *testing.T) {
 					"An unexpected error occurred attempting to parse a string value that was expected to be a valid UUID format. "+
 						"The expected UUID format is 00000000-0000-0000-0000-00000000. "+
 						"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"+
-						"Error: invalid UUID format",
+						"Provided Value: actually-not0-4a00-UUID-at0all00\n"+
+						"Parse Error: invalid UUID format",
 				),
 			},
 		},
