@@ -547,3 +547,71 @@ func TestUUIDFromString(t *testing.T) {
 		})
 	}
 }
+
+func TestNewUUID(t *testing.T) {
+	t.Parallel()
+
+	expectedSummary := "Invalid UUID String Value"
+	expectedDetail := "While creating a UUID, an invalid value was detected. " +
+		"The expected UUID format is 00000000-0000-0000-0000-00000000. " +
+		"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n" +
+		"Provided Value: %s\n" +
+		"Parse Error: %s"
+
+	tests := []struct {
+		name          string
+		value         string
+		expectedUUID  uuidtypes.UUID
+		expectedDiags diag.Diagnostics
+	}{
+		{
+			name:         "string-value-empty",
+			value:        "",
+			expectedUUID: uuidtypes.UUIDUnknown(),
+			expectedDiags: diag.Diagnostics{
+				diag.NewErrorDiagnostic(
+					expectedSummary,
+					fmt.Sprintf(expectedDetail, "", "invalid UUID length: 0"),
+				),
+			},
+		},
+		{
+			name:         "string-value-invalid-length",
+			value:        valueInvalidLength,
+			expectedUUID: uuidtypes.UUIDUnknown(),
+			expectedDiags: diag.Diagnostics{
+				diag.NewErrorDiagnostic(
+					expectedSummary,
+					fmt.Sprintf(expectedDetail, valueInvalidLength, "invalid UUID length: 17"),
+				),
+			},
+		},
+		{
+			name:         "string-value-invalid-format",
+			value:        valueInvalid,
+			expectedUUID: uuidtypes.UUIDUnknown(),
+			expectedDiags: diag.Diagnostics{
+				diag.NewErrorDiagnostic(
+					expectedSummary,
+					fmt.Sprintf(expectedDetail, valueInvalid, "invalid UUID format"),
+				),
+			},
+		},
+	}
+
+	for _, testcase := range tests {
+		testcase := testcase
+
+		t.Run(testcase.name, func(t *testing.T) {
+			t.Parallel()
+
+			gotUUID, gotDiags := uuidtypes.NewUUID(testcase.value)
+			if diff := cmp.Diff(gotUUID, testcase.expectedUUID); diff != "" {
+				t.Errorf("UUIDFromString() got = %v, want %v", gotUUID, testcase.expectedUUID)
+			}
+			if diff := cmp.Diff(gotDiags, testcase.expectedDiags); diff != "" {
+				t.Errorf("UUIDFromString() got = %v, want %v", gotDiags, testcase.expectedDiags)
+			}
+		})
+	}
+}

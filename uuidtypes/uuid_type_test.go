@@ -248,7 +248,8 @@ func TestType_Validate(t *testing.T) {
 					"An unexpected error occurred attempting to parse a string value that was expected to be a valid UUID format. "+
 						"The expected UUID format is 00000000-0000-0000-0000-00000000. "+
 						"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"+
-						"Error: invalid UUID length: 17",
+						"Provided Value: not-a-uuid-at-all\n"+
+						"Parse Error: invalid UUID length: 17",
 				),
 			},
 		},

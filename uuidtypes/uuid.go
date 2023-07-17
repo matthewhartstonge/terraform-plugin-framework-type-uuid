@@ -36,6 +36,33 @@ func UUIDUnknown() UUID {
 	return UUID{state: attr.ValueStateUnknown}
 }
 
+// NewUUID returns a UUID value or any errors when attempting to parse the
+// string as a UUID.
+func NewUUID(value string) (UUID, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	validUUID, err := uuid.Parse(value)
+	if err != nil {
+		diags.AddError(
+			"Invalid UUID String Value",
+			"While creating a UUID, an invalid value was detected. "+
+				"The expected UUID format is 00000000-0000-0000-0000-00000000. "+
+				"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"+
+				fmt.Sprintf("Provided Value: %s\n", value)+
+				fmt.Sprintf("Parse Error: %s", err.Error()),
+		)
+	}
+
+	if diags.HasError() {
+		return UUIDUnknown(), diags
+	}
+
+	return UUID{
+		state: attr.ValueStateKnown,
+		value: validUUID,
+	}, nil
+}
+
 // UUIDFromString returns a value or any errors when attempting to parse the
 // string as a UUID.
 func UUIDFromString(value string, schemaPath path.Path) (UUID, diag.Diagnostics) {
