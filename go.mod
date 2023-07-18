@@ -1,10 +1,10 @@
 module github.com/matthewhartstonge/terraform-plugin-framework-type-uuid
 
-go 1.18
+go 1.19
 
 require (
 	github.com/google/go-cmp v0.5.9
-	github.com/google/uuid v1.3.0
+	github.com/hashicorp/go-uuid v1.0.3
 	github.com/hashicorp/terraform-plugin-framework v1.3.2
 	github.com/hashicorp/terraform-plugin-go v0.18.0
 )

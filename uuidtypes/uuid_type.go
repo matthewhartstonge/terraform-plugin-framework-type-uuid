@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Matthew Hartstonge <matt@mykro.co.nz>
+ * Copyright (c) 2023 Matthew Hartstonge <matt@mykro.co.nz>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,96 +14,112 @@ import (
 	"fmt"
 
 	// External Imports
-	"github.com/google/uuid"
+	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/attr/xattr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 // Ensure Implementation matches the expected interfaces.
 var (
 	_ attr.Type                    = UUIDType{}
+	_ basetypes.StringTypable      = UUIDType{}
 	_ tftypes.AttributePathStepper = UUIDType{}
 	_ xattr.TypeWithValidate       = UUIDType{}
 )
 
-type UUIDType struct{}
-
-// ApplyTerraform5AttributePathStep always returns an error as this type cannot
-// be walked any further.
-func (u UUIDType) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
-	return nil, fmt.Errorf("cannot apply AttributePathStep to %T to %s", step, u.String())
+type UUIDType struct {
+	basetypes.StringType
 }
 
-// Equal returns true if the incoming Type is equal to the UUID type.
-func (u UUIDType) Equal(other attr.Type) bool {
-	_, ok := other.(UUIDType)
+// Equal returns true if the two values are equal.
+func (u UUIDType) Equal(o attr.Type) bool {
+	other, ok := o.(UUIDType)
+	if !ok {
+		return false
+	}
 
-	return ok
+	return u.StringType.Equal(other.StringType)
 }
 
-// String returns a human-friendly version of the UUID Type.
+// String returns a human-friendly version of the Type.
 func (u UUIDType) String() string {
 	return "uuidtypes.UUIDType"
 }
 
-// TerraformType returns tftypes.String.
-func (u UUIDType) TerraformType(_ context.Context) tftypes.Type {
-	return tftypes.String
-}
-
-// Validate returns any warnings or errors that occur while attempting to parse
-// a UUID value.
+// Validate ensures the value is a valid UUID.
 func (u UUIDType) Validate(_ context.Context, value tftypes.Value, schemaPath path.Path) diag.Diagnostics {
 	if value.IsNull() || !value.IsKnown() {
 		return nil
 	}
 
-	var str string
-	err := value.As(&str)
-	if err != nil {
-		return diag.Diagnostics{
-			diag.NewAttributeErrorDiagnostic(
-				schemaPath,
-				"Invalid UUID Terraform Value",
-				"An unexpected error occurred while attempting to read a UUID string from the Terraform value. "+
-					"Please contact the provider developers with the following:\n\n"+
-					"Error: "+err.Error(),
-			),
-		}
+	var diags diag.Diagnostics
+
+	var valueString string
+	if err := value.As(&valueString); err != nil {
+		diags.AddAttributeError(
+			schemaPath,
+			"Invalid UUID Terraform Value",
+			"An unexpected error occurred while attempting to read a UUID string from the Terraform value. "+
+				"Please contact the provider developers with the following:\n\n"+
+				"Error: "+err.Error(),
+		)
+
+		return diags
 	}
 
-	_, diags := UUIDFromString(str, schemaPath)
+	if _, err := uuid.ParseUUID(valueString); err != nil {
+		diags.AddAttributeError(
+			schemaPath,
+			"Invalid UUID String Value",
+			"An unexpected error occurred attempting to parse a string value that was expected to be a valid UUID format. "+
+				"The expected UUID format is 00000000-0000-0000-0000-00000000. "+
+				"For example, a Version 4 UUID is of the form 7b16fd41-cc23-4ef7-8aa9-c598350ccd18.\n\n"+
+				fmt.Sprintf("Provided Value: %q\n", valueString)+
+				fmt.Sprintf("Parse Error: %s", err.Error()),
+		)
+
+		return diags
+	}
 
 	return diags
 }
 
-// ValueFromTerraform returns a UUID value given a tftypes.Value.
-func (u UUIDType) ValueFromTerraform(_ context.Context, value tftypes.Value) (attr.Value, error) {
-	if value.IsNull() {
-		return UUIDNull(), nil
+// ValueFromString converts a string value to a StringValuable.
+func (u UUIDType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
+	value := UUIDValue{
+		StringValue: in,
 	}
 
-	if !value.IsKnown() {
-		return UUIDUnknown(), nil
-	}
+	// TODO: not sure if should validate the UUID here given diags are returned...?
 
-	var str string
-	if err := value.As(&str); err != nil {
-		return UUIDUnknown(), err
-	}
+	return value, nil
+}
 
-	parsedUUID, err := uuid.Parse(str)
+// ValueFromTerraform returns a UUIDValue value given a tftypes.Value.
+func (u UUIDType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := u.StringType.ValueFromTerraform(ctx, in)
 	if err != nil {
-		return UUIDUnknown(), err
+		return nil, err
 	}
 
-	return UUIDFromGoogleUUID(parsedUUID), nil
+	stringValue, ok := attrValue.(basetypes.StringValue)
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	stringValuable, diags := u.ValueFromString(ctx, stringValue)
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting StringValue to StringValuable: %v", diags)
+	}
+
+	return stringValuable, nil
 }
 
 // ValueType returns attr.Value type returned by ValueFromTerraform.
 func (u UUIDType) ValueType(context.Context) attr.Value {
-	return UUIDNull()
+	return UUIDValue{}
 }

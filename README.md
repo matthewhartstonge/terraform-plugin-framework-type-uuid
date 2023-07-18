@@ -2,46 +2,44 @@
 
 [![godoc](https://pkg.go.dev/badge/github.com/matthewhartstonge/terraform-plugin-framework-type-uuid)](https://pkg.go.dev/github.com/matthewhartstonge/terraform-plugin-framework-type-uuid)
 
-UUID string type and value implementation for the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework).
-Provides validation via Google's UUID library for Go based on [RFC 4122](https://www.rfc-editor.org/rfc/rfc4122.html)
-and DCE 1.1: Authentication and Security Services.
+UUID type and value implementation for the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework).
+Provides validation via Hashicorp's UUID library for Go based on [RFC 4122](https://www.rfc-editor.org/rfc/rfc4122.html) (note: not intended to be spec compliant)
 
 ## Getting Started
 
 ### Schema
 
-Replace usages of `types.StringType` with `uuidtypes.UUIDType{}`.
+The Terraform Plugin Framework schema types accept a `CustomType` field. The `uuidtypes.UUID` custom type can be injected into any current `schema.StringAttribute`.
 
-Given the previous schema attribute:
-
-```go
-tfsdk.Attribute{
-	Required: true
-	Type:     types.StringType 
-	// Potential prior validators...
-}
-```
-
-The updated schema will look like:
+In the following example, the ID field is set to the custom UUID Type.
 
 ```go
-tfsdk.Attribute{
-	Required: true
-	Type:     uuidtypes.UUIDType{}
+func (r *ExampleResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+    resp.Schema = schema.Schema{
+		// This description is used by the documentation generator and the language server.
+		MarkdownDescription: "Example resource",
+
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				CustomType: uuidtypes.UUIDType{},
+				Required:   true,
+				// ...
+            },
+        },
+    }
 }
 ```
 
 ### Schema Data Model
 
-Replace usage of `string`, `*string`, or `types.String` in schema data models 
-with `uuidtype.UUID`.
+Replace usage of `types.String` in schema data models with `uuidtype.UUID`.
 
 Given the previous schema data model:
 
 ```go
 type ThingResourceModel struct {
     // ...
-    Example types.String `tfsdk:"example"`
+    ID types.String `tfsdk:"id"`
 }
 ```
 
@@ -50,27 +48,26 @@ The updated schema data model will look like:
 ```go
 type ThingResourceModel struct {
     // ...
-    Example uuidtypes.UUID `tfsdk:"example"`
+    ID uuidtypes.UUID `tfsdk:"id"`
 }
 ```
 
 ### Accessing Values
 
 Similar to other value types, use the `IsNull()` and `IsUnknown()` methods to 
-check whether the value is null or unknown. Use the `String()` method to extract
+check whether the value is null or unknown. Use the `ValueString()` method to extract
 a known `uuid` value.
 
 ### Writing Values
 
 Create a `uuidtypes.UUID` by calling one of these functions:
 
-- `UUIDNull() UUID`: creates a `null` value.
-- `UUIDUnknown() UUID`: creates an unknown value.
-- `UUIDFromString(string, path.Path) (UUID, diag.Diagnostics)`: creates a known 
-   value using the given `string` or returns validation errors if `string` is 
-   not in the expected UUID format.
-- `UUIDFromGoogleUUID(uuid.UUID) UUID` creates a known value given a
-  Google [uuid.UUID](https://pkg.go.dev/github.com/google/uuid#UUID) struct.
+- `NewUUIDNull() UUID`: creates a `null` value.
+- `NewUUIDUnknown() UUID`: creates an unknown value.
+- `NewUUIDValue(string) UUID`: creates a known value using the given `string`.
+- `NewUUIDPointerValue(string) UUID`: creates a known value using the given `*string`.
+
+This type implements validation which is called and handled by Terraform. 
 
 ### Adding the Dependency
 
