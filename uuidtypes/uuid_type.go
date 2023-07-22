@@ -35,7 +35,7 @@ type UUIDType struct {
 	basetypes.StringType
 }
 
-// Equal returns true if the two values are equal.
+// Equal returns true if the two types are equivalent.
 func (u UUIDType) Equal(o attr.Type) bool {
 	other, ok := o.(UUIDType)
 	if !ok {
