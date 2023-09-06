@@ -7,8 +7,8 @@ github.com/hashicorp/go-uuid v1.0.3 h1:2gKiV6YVmrJ1i2CKKa9obLvRieoRGviZFL26PcT/C
 github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hashicorp/terraform-plugin-framework v1.3.5 h1:FJ6s3CVWVAxlhiF/jhy6hzs4AnPHiflsp9KgzTGl1wo=
 github.com/hashicorp/terraform-plugin-framework v1.3.5/go.mod h1:2gGDpWiTI0irr9NSTLFAKlTi6KwGti3AoU19rFqU30o=
-github.com/hashicorp/terraform-plugin-go v0.18.0 h1:IwTkOS9cOW1ehLd/rG0y+u/TGLK9y6fGoBjXVUquzpE=
-github.com/hashicorp/terraform-plugin-go v0.18.0/go.mod h1:l7VK+2u5Kf2y+A+742GX0ouLut3gttudmvMgN0PA74Y=
+github.com/hashicorp/terraform-plugin-go v0.19.0 h1:BuZx/6Cp+lkmiG0cOBk6Zps0Cb2tmqQpDM3iAtnhDQU=
+github.com/hashicorp/terraform-plugin-go v0.19.0/go.mod h1:EhRSkEPNoylLQntYsk5KrDHTZJh9HQoumZXbOGOXmec=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
