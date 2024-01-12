@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-uuid v1.0.3
-	github.com/hashicorp/terraform-plugin-framework v1.4.2
+	github.com/hashicorp/terraform-plugin-framework v1.5.0
 	github.com/hashicorp/terraform-plugin-go v0.20.0
 )
 
