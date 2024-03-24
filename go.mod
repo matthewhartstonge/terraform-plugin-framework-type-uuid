@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-uuid v1.0.3
-	github.com/hashicorp/terraform-plugin-framework v1.6.1
+	github.com/hashicorp/terraform-plugin-framework v1.7.0
 	github.com/hashicorp/terraform-plugin-go v0.22.1
 )
 
